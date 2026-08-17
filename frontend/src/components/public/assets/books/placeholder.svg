@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 420" role="img" aria-label="Book cover placeholder">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#F5F3FF"/>
+      <stop offset="0.55" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#FDF8F8"/>
+    </linearGradient>
+    <linearGradient id="stroke" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6C47FF" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#6C47FF" stop-opacity="0.12"/>
+    </linearGradient>
+  </defs>
+  <rect x="18" y="18" width="284" height="384" rx="26" fill="url(#bg)" stroke="url(#stroke)" stroke-width="4"/>
+  <path d="M78 120h164M78 152h120M78 184h140" stroke="#A78BFA" stroke-width="8" stroke-linecap="round" opacity="0.55"/>
+  <g opacity="0.9">
+    <path d="M118 260c0-10 8-18 18-18h48c10 0 18 8 18 18v70c0 10-8 18-18 18h-48c-10 0-18-8-18-18v-70z" fill="#FFFBFE" stroke="url(#stroke)" stroke-width="3"/>
+    <path d="M140 268h60M140 292h44" stroke="#C4B5FD" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <circle cx="252" cy="92" r="10" fill="#6C47FF" opacity="0.18"/>
+  <circle cx="76" cy="332" r="14" fill="#6C47FF" opacity="0.12"/>
+</svg>
+

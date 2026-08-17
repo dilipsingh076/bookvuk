@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 700" role="img" aria-label="BookNest hero illustration">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="0.35" stop-color="#FDF8F8"/>
+      <stop offset="0.7" stop-color="#F5F3FF"/>
+      <stop offset="1" stop-color="#EDE9FE"/>
+    </linearGradient>
+    <radialGradient id="r" cx="0.85" cy="0.15" r="0.9">
+      <stop offset="0" stop-color="#6C47FF" stop-opacity="0.16"/>
+      <stop offset="1" stop-color="#6C47FF" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="s" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1A1D2E" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#1A1D2E" stop-opacity="0.03"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="700" rx="48" fill="url(#g)"/>
+  <rect width="1200" height="700" rx="48" fill="url(#r)"/>
+  <g transform="translate(120 110)">
+    <rect x="0" y="0" width="420" height="520" rx="40" fill="#FFFBFE" stroke="#6C47FF" stroke-opacity="0.22" stroke-width="6"/>
+    <rect x="54" y="80" width="312" height="18" rx="9" fill="#A78BFA" opacity="0.55"/>
+    <rect x="54" y="120" width="248" height="18" rx="9" fill="#C4B5FD" opacity="0.7"/>
+    <rect x="54" y="160" width="280" height="18" rx="9" fill="#A78BFA" opacity="0.45"/>
+    <g transform="translate(70 240)">
+      <rect x="0" y="0" width="280" height="240" rx="28" fill="url(#s)" opacity="0.35"/>
+      <g transform="translate(26 28)" fill="none" stroke="#6C47FF" stroke-opacity="0.35" stroke-width="6" stroke-linecap="round">
+        <path d="M0 42h160"/>
+        <path d="M0 90h120"/>
+        <path d="M0 138h180"/>
+      </g>
+    </g>
+  </g>
+  <g transform="translate(620 170)">
+    <path d="M70 70c0-22 18-40 40-40h340c22 0 40 18 40 40v420c0 22-18 40-40 40H110c-22 0-40-18-40-40V70z" fill="#FFFFFF" opacity="0.9"/>
+    <path d="M110 60h340c22 0 40 18 40 40v400c0 22-18 40-40 40H110c-22 0-40-18-40-40V100c0-22 18-40 40-40z" fill="none" stroke="#6C47FF" stroke-opacity="0.18" stroke-width="8"/>
+    <g transform="translate(120 130)">
+      <path d="M160 0l160 88v210l-160 88-160-88V88L160 0z" fill="#F5F3FF" stroke="#6C47FF" stroke-opacity="0.25" stroke-width="8" stroke-linejoin="round"/>
+      <path d="M160 0v386M0 88l160 88M320 88l-160 88" stroke="#6C47FF" stroke-opacity="0.22" stroke-width="6" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>
+
