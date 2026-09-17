@@ -34,7 +34,23 @@ class BookResponse(BookBase):
     # author lives in BookBase so it's available on create/update too
     cover_image: Optional[str] = Field(None, alias="coverImage")
 
+    # "new" for a catalogue listing, otherwise the grade of a used copy. The client
+    # needs it to label the option and to show the saving against new.
+    condition: str = "new"
+    # Set on a used copy: the catalogue title it is a copy of.
+    parent_book_id: Optional[UUID] = None
+
+    # The category *name*, sent with the book so a client does not have to fetch
+    # the category list and join it itself — that was a second, serialized request
+    # on every page showing a book.
+    category: Optional[str] = None
+
     stock_status: Optional[str] = None
+
+    # "Bestseller" only when the book has actually sold; see core/merchandising.py.
+    # The client used to invent this from a hash of the id, badging a fifth of the
+    # catalogue at random.
+    badge: Optional[str] = None
 
     def model_post_init(self, __context):
         self.stock_status = "in stock" if self.stock > 0 else "out of stock"

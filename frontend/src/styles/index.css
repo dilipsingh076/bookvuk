@@ -1,21 +1,20 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Simple base styling to match the screenshot look/feel. */
 html,
 body {
   height: 100%;
 }
 
+/* The font stack and page background come from `theme/tokens.ts` via
+   `tailwind.config.ts`. Inter itself is loaded by `next/font` in the root
+   layout — the `@import` that used to sit at the top of this file was a blocking
+   request to fonts.googleapis.com before any text could paint. */
 body {
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica,
-    Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  @apply bg-bookvuk-cream font-sans;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #fdf8f8;
 }
 
 /* Scrollbar visibility control for category panel.
@@ -41,6 +40,5 @@ body {
 }
 
 .category-scroll--visible::-webkit-scrollbar-thumb {
-  background-color: rgba(108, 71, 255, 0.35);
-  border-radius: 9999px;
+  @apply rounded-full bg-bookvuk-purple/[0.35];
 }

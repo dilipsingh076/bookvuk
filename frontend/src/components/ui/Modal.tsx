@@ -1,4 +1,6 @@
-import { useEffect, useRef } from "react";
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 
@@ -18,6 +20,28 @@ const Modal = ({ isOpen, onClose, children, panelClassName = "" }: ModalProps) =
   const hasCustomMaxWidth = /\bmax-w-/.test(panelClassName);
   const widthClass = hasCustomMaxWidth ? "" : "max-w-lg";
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+
+  /* `createPortal` needs `document`, which does not exist while Next renders on
+   * the server — and a route that opens straight into a dialog (`/login`,
+   * `/reset-password`) does render there. So the portal waits for the mount.
+   *
+   * Nothing is lost: a dialog is browser-only by nature, and the routes that
+   * present one have their own metadata, so the HTML a crawler reads is complete
+   * without it. */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  /* A click only dismisses the dialog if it *started* on the backdrop.
+   *
+   * Without this, a click that begins inside the panel and ends anywhere else
+   * closes the dialog — and that is not hypothetical. Clicking a link in the book
+   * dialog started a navigation, the dialog unmounted mid-gesture, the backdrop
+   * ended up under the cursor, and its handler ran `router.back()` — landing the
+   * visitor back on the book they had just left. Intermittently, depending on
+   * which happened first, which is why it looked like the links "sometimes did
+   * not work".
+   */
+  const backdropArmed = useRef(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -67,7 +91,7 @@ const Modal = ({ isOpen, onClose, children, panelClassName = "" }: ModalProps) =
     };
   }, [isOpen]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !mounted) return null;
 
   return createPortal(
     <div
@@ -76,13 +100,20 @@ const Modal = ({ isOpen, onClose, children, panelClassName = "" }: ModalProps) =
     >
       {/* Full-screen layer: blur + dim; must be below panel so outside clicks hit this */}
       <div
-        className="absolute inset-0 cursor-default bg-booknest-navy/45 backdrop-blur-[8px]"
+        className="absolute inset-0 cursor-default bg-bookvuk-navy/45 backdrop-blur-[8px]"
         aria-hidden
-        onClick={() => onClose?.()}
+        onMouseDown={(e) => {
+          backdropArmed.current = e.target === e.currentTarget;
+        }}
+        onClick={(e) => {
+          if (!backdropArmed.current || e.target !== e.currentTarget) return;
+          backdropArmed.current = false;
+          onClose?.();
+        }}
       />
       <div
         ref={panelRef}
-        className={`relative z-10 w-full ${widthClass} max-h-[min(92vh,900px)] overflow-x-hidden overflow-y-auto rounded-[22px] bg-white shadow-booknest-card ring-1 ring-booknest-border/80 ${panelClassName}`.trim()}
+        className={`relative z-10 w-full ${widthClass} max-h-[min(92vh,900px)] overflow-x-hidden overflow-y-auto rounded-[22px] bg-white shadow-bookvuk-card ring-1 ring-bookvuk-border/80 ${panelClassName}`.trim()}
         role="dialog"
         aria-modal="true"
       >

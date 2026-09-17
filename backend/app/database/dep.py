@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException
 from app.core.security import get_current_user
 
 def require_role(role: str):

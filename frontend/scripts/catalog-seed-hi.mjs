@@ -1,7 +1,7 @@
 /**
  * 100 Hindi titles (display in Devanagari). titleSearch/authorSearch help Open Library cover lookup.
  */
-export default [
+const hindiTitles = [
   { t: "गोदान", a: "मुंशी प्रेमचंद", ts: "Godan", as: "Munshi Premchand" },
   { t: "निर्मला", a: "मुंशी प्रेमचंद", ts: "Nirmala", as: "Munshi Premchand" },
   { t: "कर्मभूमि", a: "मुंशी प्रेमचंद", ts: "Karmabhoomi", as: "Munshi Premchand" },
@@ -103,3 +103,5 @@ export default [
   { t: "ब्रह्मराक्षसी", a: "धूमिल", ts: "Brahmrakshasi", as: "Dhoomil" },
   { t: "जनशक्ति", a: "रामधारी सिंह दिनकर", ts: "Janashakti", as: "Ramdhari Singh Dinkar" }
 ];
+
+export default hindiTitles;

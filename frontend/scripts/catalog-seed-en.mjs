@@ -1,5 +1,5 @@
 /** 100 popular English titles in India: fiction, non-fiction, business, self-help, history, sci-fi, tech. */
-export default [
+const englishTitles = [
   ["Five Point Someone", "Chetan Bhagat", "Fiction"],
   ["One Night @ the Call Center", "Chetan Bhagat", "Fiction"],
   ["The 3 Mistakes of My Life", "Chetan Bhagat", "Fiction"],
@@ -101,3 +101,5 @@ export default [
   ["Clean Code", "Robert C. Martin", "Technology"],
   ["The Pragmatic Programmer", "David Thomas", "Technology"]
 ];
+
+export default englishTitles;

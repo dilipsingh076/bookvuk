@@ -23,9 +23,7 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
-from decimal import Decimal
 from pathlib import Path
 
 from pydantic import ValidationError
