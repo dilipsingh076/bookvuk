@@ -1,0 +1,136 @@
+# Render Blueprint — the storefront and the API, from this one repository.
+#
+# Render reads this on "New > Blueprint" and creates both services. Nothing
+# secret lives here: every credential is `sync: false`, which makes Render prompt
+# for it once and store it, so this file is safe to commit.
+#
+# ── Two decisions worth knowing ────────────────────────────────────────────────
+#
+# 1. **Native runtimes, not Docker.** The free plan includes a fixed pool of
+#    build minutes per month, and a Docker build spends far more of it than
+#    `pip install` / `npm ci`. The native runtimes also take NEXT_PUBLIC_* as
+#    ordinary build-time env vars instead of the build ARGs the frontend
+#    Dockerfile has to declare. Nothing in this repository builds the
+#    Dockerfiles any more — they are kept only as a record of the image.
+#
+# 2. **Migrations are not in here.** Render's `preDeployCommand` requires a paid
+#    instance type. That costs nothing in practice: the database is Supabase, not
+#    Render, so it is reachable from anywhere. Run this from your laptop after a
+#    deploy that adds a migration —
+#
+#      cd backend && PYTHONPATH=. ./venv/bin/alembic upgrade head
+#
+#    The API image deliberately does not migrate on start (see backend/Dockerfile):
+#    a container that migrates on boot races its own replicas.
+
+services:
+  # ── API ─────────────────────────────────────────────────────────────────────
+  - type: web
+    name: bookvuk-api
+    runtime: python
+    plan: free
+    region: singapore          # closest to the Supabase ap-northeast-1 pooler
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    # One worker, not the Dockerfile's four. Two reasons, and both bite at 512MB:
+    # each worker holds its own connection pool (4 workers = 40 Supabase
+    # connections, see README "Connection budget"), and four Python processes do
+    # not fit in the free instance's memory.
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health   # no database access, so a brief DB blip does not
+                               # pull the instance out of rotation
+    envVars:
+      - key: PYTHONPATH
+        value: .
+      # Paste the Supabase **session pooler** URI (port 5432) — the transaction
+      # pooler is for serverless, and the direct connection is IPv6-only.
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_SSLMODE
+        value: require
+      # Render generates this once and keeps it. Never reuse the local .env key:
+      # a key that has been on a laptop is a key that can forge admin tokens.
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: "30"
+      - key: REFRESH_TOKEN_EXPIRE_DAYS
+        value: "30"
+
+      # The storefront reaches the API through Next's rewrites, so it is
+      # same-origin and needs no CORS entry at all. Left empty deliberately.
+      - key: CORS_ORIGINS
+        value: ""
+      - key: SITE_URL
+        value: https://bookvuk.com
+
+      # Covers must not be written to the instance filesystem: it is wiped on
+      # every deploy, so the upload would 200 and the image would vanish days
+      # later. Create a PUBLIC bucket named book-covers in Supabase Storage.
+      # SUPABASE_SERVICE_KEY is the *service role* key — the anon key cannot
+      # write under the default policies.
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SUPABASE_STORAGE_BUCKET
+        value: book-covers
+
+      # The free plan has no background-worker service type, so the job queue
+      # runs in this process. Without it, order confirmations, refunds and
+      # abandoned-cart sweeps queue up and are never processed.
+      - key: RUN_WORKER_IN_PROCESS
+        value: "true"
+
+      # Shared across workers rather than counted per process. With one worker
+      # today it changes nothing; it stops the limit silently multiplying if the
+      # worker count is ever raised.
+      - key: RATE_LIMIT_BACKEND
+        value: database
+      - key: LOG_JSON
+        value: "true"
+
+  # ── Storefront ──────────────────────────────────────────────────────────────
+  - type: web
+    name: bookvuk-web
+    runtime: node
+    plan: free
+    region: singapore
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    startCommand: npm start     # scripts/serve-standalone.mjs — `next start` does
+                                # not work with output: "standalone"
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      # Next's standalone server binds `localhost` unless told otherwise, and a
+      # service that binds localhost fails Render's health check with no useful
+      # error. The Dockerfile sets this; a native runtime does not.
+      - key: HOSTNAME
+        value: 0.0.0.0
+
+      # The API as seen from the Next server (server components, generateMetadata,
+      # the sitemap). Paste the API service's URL once it has deployed —
+      # https://bookvuk-api.onrender.com, or whatever Render assigned it.
+      # Deliberately not guessed here: a wrong value fails silently, as an empty
+      # catalogue rather than an error.
+      - key: API_INTERNAL_URL
+        sync: false
+
+      # Empty on purpose: the browser talks to this origin and Next rewrites
+      # /api, /auth and /static through to the API. One origin, no CORS.
+      - key: NEXT_PUBLIC_API_BASE_URL
+        value: ""
+      # Inlined into the client bundle at build time, so it must be right before
+      # the build runs. src/lib/site.ts fails the build if it still says localhost.
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://bookvuk.com
+      - key: NEXT_PUBLIC_SUPPORT_EMAIL
+        value: support@bookvuk.com
+      # Must match the API's SUPABASE_URL. Feeds the CSP's img-src — without it
+      # the browser blocks every uploaded cover and shows nothing in the network
+      # tab to explain why.
+      - key: NEXT_PUBLIC_MEDIA_ORIGIN
+        sync: false
